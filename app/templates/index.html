@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD Application</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='fonts/teacher.png') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="jumbotron text-center">
+            <h1>Python Flask Application CRUD</h1>
+        </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>
+                        Appointment List
+                             {% if appointments != False %}
+                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#modal_add_appointment">Add Appointment</button>
+                        {% else %}
+                            <div class="alert alert-danger h6 mt-1">
+                                Malheureusement, la connexion à la base de données n'a pas pu se faire, vos rendez-vous ne sont pas disponibles ! Réessayez plus tard :)
+                            </div>
+                        {% endif %}
+                    </h2>
+                      {% with messages = get_flashed_messages() %}
+                       {% if messages %}
+                          {% for message in messages %}
+
+                              <div class="alert alert-success ">
+
+                                  <button type="button" class="text-danger" data-dismiss="alert">x</button>
+                                  <span>{{ message }}</span>
+                              </div>
+
+                          {% endfor %}
+                       {% endif %}
+                    {% endwith %}
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="modal_add_appointment" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+
+                          <div class="modal-body">
+
+                            <form method="POST" action="{{ url_for('insert') }}" id="form_insert">
+                              <div class="form-group">
+                                <label for="datetime_insert">Date and hour</label>
+                                <input type="text" name="datetime" class="form-control" id="datetime_insert" aria-describedby="emailHelp" placeholder="0000-00-00 00:00" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="city_insert">Where?</label>
+                                <input type="text" name="city" class="form-control" id="city_insert" aria-describedby="emailHelp" placeholder="City" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="subject_insert">What?</label>
+                                <input type="text" name="subject" class="form-control" id="subject_insert" aria-describedby="emailHelp" placeholder="Densite" required>
+                              </div>
+                              <div class="form-group">
+                                <label for="address_insert">Address</label>
+                                <input type="text" name="address" class="form-control" id="address_insert" aria-describedby="emailHelp" placeholder="1158 place of dark" required>
+                              </div>
+                                <button type="submit" class="btn btn-success float-right" id="btn_insert">Save appointment</button>
+
+                            </form>
+
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                    <!-- end modal -->
+
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Date and time</th>
+                            <th>Where?</th>
+                            <th>What?</th>
+                            <th>Address</th>
+                            <th>Action</th>
+                        </tr>
+                        {% if appointments != False %}
+                            {% for appointment in appointments %}
+                            <tr>
+                                <td>{{ appointment.1 }}</td>
+                                <td>{{ appointment.2 }}</td>
+                                <td>{{ appointment.3 }}</td>
+                                <td>{{ appointment.4 }}</td>
+                                <td>
+                                    <a href="/update/{{ appointment.0}}" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modal_update_appointment{{ appointment.0 }}">Edit</a>
+                                       <!-- Modal -->
+                                        <div class="modal fade" id="modal_update_appointment{{ appointment.0 }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                          <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                              <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalCenterTitle">Modifier le rendez-vous</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                  <span aria-hidden="true">&times;</span>
+                                                </button>
+                                              </div>
+
+                                              <div class="modal-body">
+
+                                                <form method="POST" id="form" action="/update/{{ appointment.0}}">
+                                                  <div class="form-group">
+                                                    <label for="datetime_update">Date and hour</label>
+                                                    <input type="text" name="datetime" class="form-control" id="datetime_update" aria-describedby="emailHelp" placeholder="0000-00-00 00:00:00">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="city_update">Where?</label>
+                                                    <input type="text" name="city" class="form-control" id="city_update" aria-describedby="emailHelp" placeholder="City" value="{{ appointment.2 }}">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="subject_update">What?</label>
+                                                    <input type="text" name="subject" class="form-control" id="subject_update" aria-describedby="emailHelp" placeholder="Densite"  value="{{ appointment.3 }}">
+                                                  </div>
+                                                  <div class="form-group">
+                                                    <label for="address_update">Address</label>
+                                                    <input type="text" name="address" class="form-control" id="address_update" aria-describedby="emailHelp" placeholder="1158 place of dark"  value="{{ appointment.4 }}">
+                                                  </div>
+
+                                                  <button type="submit" class="btn btn-success float-right">Update appointment</button>
+                                                </form>
+
+                                              </div>
+
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <!-- end modal -->
+
+                                    <a href="/delete/{{ appointment.0}}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure to delete?')">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </table>
+
+
+                </div>
+            </div>
+
+        <footer class="jumbotron mt-3 mb-5 pt-3 pb-5">
+            <span class="float-left">Website:dev.amorce.org/anthony</span>
+            <span class="float-right">CV:dev.amorce.org/anthony/images/cv.pdf</span>
+        </footer>
+    </div>
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+
+</body>
+</html>
